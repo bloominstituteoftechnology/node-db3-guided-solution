@@ -22,9 +22,10 @@ exports.up = function(knex, Promise) {
       tbl
         .integer('track_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('tracks')
-        .onDelete('CASCADE') // explain how cascading works
+        .onDelete('RESTRICT') // explain how cascading works
         .onUpdate('CASCADE');
     })
     .createTable('students', tbl => {
@@ -39,17 +40,19 @@ exports.up = function(knex, Promise) {
       tbl
         .integer('cohort_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('cohorts')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
         .onUpdate('CASCADE');
 
       tbl
         .integer('student_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('students')
-        .onDelete('CASCADE')
+        .onDelete('RESTRICT')
         .onUpdate('CASCADE');
     });
 };

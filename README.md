@@ -197,8 +197,8 @@ We may want an endpoint to get all posts for a specific user:
 Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join.
 
 ```js
-  db
-    .select('posts.id', 'username', 'contents'
+  const posts = await db
+    .select('posts.id', 'username', 'contents')
     .from('posts')
     .join('users', 'users.id', 'posts.user_id').where({ user_id: id });
 ```
@@ -269,7 +269,7 @@ module.exports = {
   // findPosts, 
   // add, 
   // update, 
-  // delete
+  // remove
 }
 ```
 
@@ -282,7 +282,7 @@ module.exports = {
   findPosts, 
   // add, 
   // update, 
-  // delete
+  // remove
 }
 
 function find() {
@@ -300,7 +300,7 @@ function findById(id) {
 function findPosts(user_id) {
   // copy code from GET /api/users/:id/posts
   return db
-    .select('posts.id', 'username', 'contents'
+    .select('posts.id', 'username', 'contents')
     .from('posts')
     .join('users', 'users.id', 'posts.user_id')
      // update to match param name   
@@ -327,17 +327,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-  router.get('/:id/posts', async (req, res) => {
-    const { id } = params;
+router.get('/:id/posts', async (req, res) => {
+  const { id } = req.params;
 
-    try {
-      // update here
-      const posts = await Users.findPosts(id);
-      res.json(posts);
-    } catch (err) {
-      res.status(500).json({ message: 'failed to get posts' });
-    }
-  });
+  try {
+    // update here
+    const posts = await Users.findPosts(id);
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'failed to get posts' });
+  }
+});
 
 ```
 
@@ -346,7 +346,7 @@ router.get('/:id', async (req, res) => {
 Write the add function next.
 
 ```js
-functon add(user) {
+function add(user) {
   // returns an array with new user id
   return db('users').insert(user);
 }
@@ -435,3 +435,5 @@ router.delete('/:id', async (req, res) => {
   }
 });
 ```
+
+We can remove `const db = require('../data/dbConfig.js)` from our `users-router` file. 

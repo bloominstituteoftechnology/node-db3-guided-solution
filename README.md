@@ -17,7 +17,7 @@ The [Starter Code](https://github.com/LambdaSchool/webdb-iii-guided) for this pr
 
 - clone the [starter code](https://github.com/LambdaSchool/webapi-iii-guided).
 - create a solution branch: `git checkout -b solution`.
-- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/webapi-iii-guided-solution`
+- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/webdb-iii-guided-solution`
 - pull from this repository's `master` branch into the `solution` branch in your local folder `git pull solution master:solution --force`.
 
 A this point you should have a `master` branch pointing to the student's repository and a `solution` branch with the latest changes added to the solution repository.

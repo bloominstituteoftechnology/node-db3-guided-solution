@@ -1,8 +1,8 @@
-# Web DB III Guided Project Solution
+# Web DB IV Guided Project Solution
 
-Guided project solution for **Web DB III** Module.
+Guided project solution for **Web DB IV** Module.
 
-Starter code is here: [Web DB III Guided Project](https://github.com/LambdaSchool/webdb-iii-guided).
+Starter code is here: [Web DB IV Guided Project](https://github.com/LambdaSchool/webdb-iv-guided).
 
 ## Prerequisites
 
@@ -11,13 +11,13 @@ Starter code is here: [Web DB III Guided Project](https://github.com/LambdaSchoo
 
 ## Starter Code
 
-The [Starter Code](https://github.com/LambdaSchool/webdb-iii-guided) for this project is configured to run the server by typing `yarn server` or `npm run server`. The server will restart automatically on changes.
+The [Starter Code](https://github.com/LambdaSchool/webdb-iv-guided) for this project is configured to run the server by typing `yarn server` or `npm run server`. The server will restart automatically on changes.
 
 ## How to Use this Repository
 
-- clone the [starter code](https://github.com/LambdaSchool/webapi-iii-guided).
+- clone the [starter code](https://github.com/LambdaSchool/webapi-iv-guided).
 - create a solution branch: `git checkout -b solution`.
-- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/webdb-iii-guided-solution`
+- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/webdb-iv-guided-solution`
 - pull from this repository's `master` branch into the `solution` branch in your local folder `git pull solution master:solution --force`.
 
 A this point you should have a `master` branch pointing to the student's repository and a `solution` branch with the latest changes added to the solution repository.
@@ -36,7 +36,7 @@ Review foreign keys in TK. You may use [SQLTryIt](https://w3schools.com/Sql/tryi
 
 ## Join Statements
 
-Open [SQLTryIt](https://w3schools.com/Sql/tryit.asp?filename=trysql_select_top). 
+Open [SQLTryIt](https://w3schools.com/Sql/tryit.asp?filename=trysql_select_top).
 
 Pull up the products table. We can see that there are two foreign keys in this table, which doesn't allow us to easily see who the supplier is for each product. Run:
 
@@ -66,9 +66,9 @@ SELECT ProductName, CategoryName FROM Products
 JOIN Categories ON Products.CategoryId = Categories.CategoryId;
 ```
 
-Note that each joined table must link to the original table. 
+Note that each joined table must link to the original table.
 
-In 
+In
 
 ### Aliases, Where, Order By
 
@@ -80,7 +80,7 @@ JOIN Suppliers ON Products.SupplierId = Suppliers.SupplierId
 JOIN Categories ON Products.CategoryId = Categories.CategoryId;
 ```
 
-Note that each joined table must link the the original table. 
+Note that each joined table must link the the original table.
 
 In these cases (and in joins in general) things can get wordy so we like to alias our table names
 
@@ -109,10 +109,9 @@ ORDER BY Price;
 
 **wait for students to catch up, use a `yes/no` poll to let students tell you when they are done**
 
-
 ### Types of Joins
 
-Go into the `categories` table and remove two records: 
+Go into the `categories` table and remove two records:
 
 ```sql
 DELETE FROM Categories WHERE CategoryID = 1 OR CategoryId = 4;
@@ -125,7 +124,7 @@ SELECT ProductName, CategoryName FROM Products as P
 JOIN Categories AS C ON P.CategoryId = C.CategoryId;
 ```
 
-Notice that some products don't appear, because they are missing a category. This is called an `inner join` and is the default join in this environment. It only shows rows where records from **both** tables are represented. 
+Notice that some products don't appear, because they are missing a category. This is called an `inner join` and is the default join in this environment. It only shows rows where records from **both** tables are represented.
 
 If instead we wanted to see **all** records from our first primary (`products`), which is also called the `left table` in a join statement, we could use a `left join`:
 
@@ -140,16 +139,16 @@ Once finished, reset the database.
 
 ### Aggregate functions
 
-If we wanted to know the cheapest product, we could always sort the data. But what if we wanted to know the cheapest product by category. 
+If we wanted to know the cheapest product, we could always sort the data. But what if we wanted to know the cheapest product by category.
 
 ```sql
 SELECT ProductName, CategoryId, min(Price) FROM Products
 GROUP BY CategoryId;
 ```
 
-Explain min and GROUP BY. Min is an aggregate functions (like `sum`, `count`, `min`, `avg`, `max`). Aggregate functions are often useful when working with multi table schemas, because we want to cluster records. 
+Explain min and GROUP BY. Min is an aggregate functions (like `sum`, `count`, `min`, `avg`, `max`). Aggregate functions are often useful when working with multi table schemas, because we want to cluster records.
 
-We often want to use aliases with aggregate functions as well. 
+We often want to use aliases with aggregate functions as well.
 
 ```sql
 SELECT ProductName, CategoryId, min(Price) as Price FROM Products
@@ -173,48 +172,47 @@ GROUP BY CategoryId;
 
 ## Multi-Table APIs
 
-Begin working with the guided demo. Show the students the `users` and `posts` tables in `SQLiteStudio`, emphasizing the foreign key in `posts`. Show them that we currently have CRUD endpoints for `users`. 
-
+Begin working with the guided demo. Show the students the `users` and `posts` tables in `SQLiteStudio`, emphasizing the foreign key in `posts`. Show them that we currently have CRUD endpoints for `users`.
 
 ### GET /api/users/:id/posts
 
 We may want an endpoint to get all posts for a specific user:
 
 ```js
-  router.get('/:id/posts', async (req, res) => {
-    const { id } = params;
+router.get('/:id/posts', async (req, res) => {
+  const { id } = params;
 
-    try {
-      const posts = await db('posts').where({ user_id: id });
+  try {
+    const posts = await db('posts').where({ user_id: id });
 
-      res.json(posts);
-    } catch (err) {
-      res.status(500).json({ message: 'failed to get posts' });
-    }
-  });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'failed to get posts' });
+  }
+});
 ```
 
 Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join.
 
 ```js
-  const posts = await db
-    .select('posts.id', 'username', 'contents')
-    .from('posts')
-    .join('users', 'users.id', 'posts.user_id').where({ user_id: id });
+const posts = await db
+  .select('posts.id', 'username', 'contents')
+  .from('posts')
+  .join('users', 'users.id', 'posts.user_id')
+  .where({ user_id: id });
 ```
 
 Breakdown the syntax of the knex join. Explain why we have clarify `posts.id` and `users.id`.
 
-Hit the endpoint with postman or the browswer to see the join statement in action. 
+Hit the endpoint with postman or the browswer to see the join statement in action.
 
 **wait for students to catch up, use a `yes/no` poll to let students tell you when they are done**
 
+## DB Access
 
-## DB Access 
+We've writing our knex logic directly into the route handlers. This isn't best practice. It's best to separate out all database code in the **database access files** (also called **models**).
 
-We've writing our knex logic directly into the route handlers. This isn't best practice. It's best to separate out all database code in the **database access files** (also called **models**). 
-
-We've already worked with these types of file in the previous sprint. 
+We've already worked with these types of file in the previous sprint.
 
 Create `./users/user-model.js` file and add the following.
 
@@ -222,17 +220,15 @@ Create `./users/user-model.js` file and add the following.
 // database connection via knex
 const db = require('../data/db-config.js');
 
-module.exports = {
-
-}
+module.exports = {};
 ```
 
-We can now begin to move all database logic into database access methods. 
+We can now begin to move all database logic into database access methods.
 
 ```js
 module.exports = {
-  find
-}
+  find,
+};
 
 function find() {
   return db('users');
@@ -249,7 +245,7 @@ const Users = require('./user-model.js');
 
 router.get('/', async (req, res) => {
   try {
-    // use find() 
+    // use find()
     // instead of querying db directly
     const users = await Users.find();
     res.json(users);
@@ -260,17 +256,17 @@ router.get('/', async (req, res) => {
 
 ```
 
-Our goal is to completely remove database logic from the router file. List the other methods we would need. 
+Our goal is to completely remove database logic from the router file. List the other methods we would need.
 
 ```js
 module.exports = {
   find,
-  // findById, 
-  // findPosts, 
-  // add, 
-  // update, 
+  // findById,
+  // findPosts,
+  // add,
+  // update,
   // remove
-}
+};
 ```
 
 Write the other find methods
@@ -278,12 +274,12 @@ Write the other find methods
 ```js
 module.exports = {
   find,
-  findById, 
-  findPosts, 
-  // add, 
-  // update, 
+  findById,
+  findPosts,
+  // add,
+  // update,
   // remove
-}
+};
 
 function find() {
   return db('users');
@@ -293,18 +289,21 @@ function findById(id) {
   // introduce first()
   // we can return a single user object
   // instead of an array
-  return db('users').where({ id }).first()
+  return db('users')
+    .where({ id })
+    .first();
 }
-
 
 function findPosts(user_id) {
   // copy code from GET /api/users/:id/posts
-  return db
-    .select('posts.id', 'username', 'contents')
-    .from('posts')
-    .join('users', 'users.id', 'posts.user_id')
-     // update to match param name   
-    .where({ user_id });
+  return (
+    db
+      .select('posts.id', 'username', 'contents')
+      .from('posts')
+      .join('users', 'users.id', 'posts.user_id')
+      // update to match param name
+      .where({ user_id })
+  );
 }
 ```
 
@@ -388,7 +387,9 @@ One possible solution:
 
 ```js
 async function update(changes, id) {
-  await db('users').where({ id }).update(changes);
+  await db('users')
+    .where({ id })
+    .update(changes);
 
   // returns new user
   return findById(id);
@@ -396,7 +397,9 @@ async function update(changes, id) {
 
 function remove(id) {
   // returns removed count
-  return db('users').where({ id }).del();
+  return db('users')
+    .where({ id })
+    .del();
 }
 ```
 
@@ -436,4 +439,4 @@ router.delete('/:id', async (req, res) => {
 });
 ```
 
-We can remove `const db = require('../data/dbConfig.js)` from our `users-router` file. 
+We can remove `const db = require('../data/dbConfig.js)` from our `users-router` file.

@@ -1,8 +1,8 @@
-# Web DB IV Guided Project Solution
+# Node DB3 Guided Project Solution
 
-Guided project solution for **Web DB IV** Module.
+Guided project solution for **Node DB3** Module.
 
-Starter code is here: [Web DB IV Guided Project](https://github.com/LambdaSchool/webdb-iv-guided).
+Starter code is here: [Node DB3 Guided Project](https://github.com/LambdaSchool/node-db3-guided).
 
 ## Prerequisites
 
@@ -11,13 +11,13 @@ Starter code is here: [Web DB IV Guided Project](https://github.com/LambdaSchool
 
 ## Starter Code
 
-The [Starter Code](https://github.com/LambdaSchool/webdb-iv-guided) for this project is configured to run the server by typing `yarn server` or `npm run server`. The server will restart automatically on changes.
+The [Starter Code](https://github.com/LambdaSchool/node-db3-guided) for this project is configured to run the server by typing `yarn server` or `npm run server`. The server will restart automatically on changes.
 
 ## How to Use this Repository
 
-- clone the [starter code](https://github.com/LambdaSchool/webapi-iv-guided).
+- clone the [starter code](https://github.com/LambdaSchool/node-db3-guided).
 - create a solution branch: `git checkout -b solution`.
-- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/webdb-iv-guided-solution`
+- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/node-db3-guided-solution`
 - pull from this repository's `master` branch into the `solution` branch in your local folder `git pull solution master:solution --force`.
 
 A this point you should have a `master` branch pointing to the student's repository and a `solution` branch with the latest changes added to the solution repository.
@@ -55,7 +55,7 @@ JOIN Suppliers ON Products.SupplierId = Suppliers.SupplierId;
 
 Breakdown the syntax of this join statement.
 
-#### YOU DO (3 minutes)
+### YOU DO (3 minutes)
 
 Write a SQL statement to see `ProductName` and `CategoryName` and for each product.
 
@@ -155,7 +155,7 @@ SELECT ProductName, CategoryId, min(Price) as Price FROM Products
 GROUP BY CategoryId;
 ```
 
-#### YOU DO (3 minutes)
+### YOU DO (3 minutes)
 
 Write a SQL statement to see a count of how many products are in each category.
 
@@ -196,9 +196,9 @@ Notice that the response does not include the username of the poster, which may 
 
 ```js
 const posts = await db('posts as p')
-      .join('users as u', 'u.id', 'p.user_id')
-      .select('p.id', 'u.username', 'p.contents')
-      .where({ user_id: id });
+  .join('users as u', 'u.id', 'p.user_id')
+  .select('p.id', 'u.username', 'p.contents')
+  .where({ user_id: id });
 ```
 
 Breakdown the syntax of the knex join. Explain why we have clarify `posts.id` and `users.id`.
@@ -304,7 +304,7 @@ function findPosts(user_id) {
 }
 ```
 
-#### YOU DO (5 minutes)
+### YOU DO (5 minutes)
 
 Refactor `GET /api/users/:id` and `GET /api/users/:id/posts` to use the new access methods.
 
@@ -351,8 +351,8 @@ function add(user) {
 We may wish instead to return the new users.
 
 ```js
-async functon add(user) {
-  const [ id ] = await db('users').insert(user);
+async function add(user) {
+  const [id] = await db('users').insert(user);
 
   // we can use our findById method
   return findById(id);

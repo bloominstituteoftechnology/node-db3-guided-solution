@@ -195,11 +195,10 @@ router.get('/:id/posts', async (req, res) => {
 Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join.
 
 ```js
-const posts = await db
-  .select('posts.id', 'username', 'contents')
-  .from('posts')
-  .join('users', 'users.id', 'posts.user_id')
-  .where({ user_id: id });
+const posts = await db('posts as p')
+      .join('users as u', 'u.id', 'p.user_id')
+      .select('p.id', 'u.username', 'p.contents')
+      .where({ user_id: id });
 ```
 
 Breakdown the syntax of the knex join. Explain why we have clarify `posts.id` and `users.id`.
@@ -296,13 +295,11 @@ function findById(id) {
 
 function findPosts(user_id) {
   // copy code from GET /api/users/:id/posts
-  return (
-    db
-      .select('posts.id', 'username', 'contents')
-      .from('posts')
-      .join('users', 'users.id', 'posts.user_id')
+  return db('posts as p')
+      .join('users as u', 'u.id', 'p.user_id')
+      .select('p.id', 'u.username', 'p.contents')
       // update to match param name
-      .where({ user_id })
+      .where({ user_id });
   );
 }
 ```

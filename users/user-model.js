@@ -23,11 +23,10 @@ function findById(id) {
 
 function findPosts(user_id) {
   // copy code from GET /api/users/:id/posts
-  return db
-    .select('posts.id', 'username', 'contents')
-    .from('posts')
-    .join('users', 'users.id', 'posts.user_id')
-     // update to match param name   
+  return db('posts as p')
+    .join('users as u', 'u.id', 'p.user_id')
+    .select('p.id', 'u.username', 'p.contents')
+    // update to match param name
     .where({ user_id });
 }
 

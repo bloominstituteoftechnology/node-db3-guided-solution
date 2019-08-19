@@ -30,18 +30,19 @@ function findPosts(user_id) {
     .where({ user_id });
 }
 
-async function add(user) {
-  const [ id ] = await db('users').insert(user);
-
-  // we can use our findById method
-  return findById(id);
+function add(user) {
+  // returns an array with new user id
+  return db('users').insert(user);
 }
 
-async function update(changes, id) {
-  await db('users').where({ id }).update(changes);
-
-  // returns new user
-  return findById(id);
+function update(changes, id) {
+  db('users')
+    .where({ id })
+    .update(changes)
+  .then(count => {
+    // returns new user
+    return findById(id);
+  });
 }
 
 function remove(id) {

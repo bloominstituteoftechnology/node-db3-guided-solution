@@ -66,13 +66,9 @@ SELECT ProductName, CategoryName FROM Products
 JOIN Categories ON Products.CategoryId = Categories.CategoryId;
 ```
 
-Note that each joined table must link to the original table.
-
-In
-
 ### Aliases, Where, Order By
 
-We could even combine two joins so see all three columns:
+We could even combine two joins to see all three columns:
 
 ```sql
 SELECT ProductName, SupplierName, CategoryName FROM Products
@@ -111,7 +107,7 @@ ORDER BY Price;
 
 ### Types of Joins
 
-Go into the `categories` table and remove two records:
+Go into the `Categories` table and remove two records:
 
 ```sql
 DELETE FROM Categories WHERE CategoryID = 1 OR CategoryId = 4;
@@ -126,7 +122,7 @@ JOIN Categories AS C ON P.CategoryId = C.CategoryId;
 
 Notice that some products don't appear, because they are missing a category. This is called an `inner join` and is the default join in this environment. It only shows rows where records from **both** tables are represented.
 
-If instead we wanted to see **all** records from our first primary (`products`), which is also called the `left table` in a join statement, we could use a `left join`:
+If instead we wanted to see **all** records from our primary table (`products`), which is also called the `left table`, we could use a `left join`:
 
 ```sql
 SELECT ProductName, CategoryName FROM Products as P
@@ -179,29 +175,32 @@ Begin working with the guided demo. Show the students the `users` and `posts` ta
 We may want an endpoint to get all posts for a specific user:
 
 ```js
-router.get('/:id/posts', async (req, res) => {
+router.get('/:id/posts', (req, res) => {
   const { id } = params;
 
-  try {
-    const posts = await db('posts').where({ user_id: id });
-
+  db('posts').where({ user_id: id })
+  .then(posts => {
     res.json(posts);
-  } catch (err) {
+  })
+  .catch (err => {
     res.status(500).json({ message: 'failed to get posts' });
-  }
+  });
 });
 ```
 
 Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join.
 
 ```js
-const posts = await db('posts as p')
+db('posts as p')
   .join('users as u', 'u.id', 'p.user_id')
   .select('p.id', 'u.username', 'p.contents')
-  .where({ user_id: id });
+  .where({ user_id: id })
+.then(posts => {
+
+})
 ```
 
-Breakdown the syntax of the knex join. Explain why we have clarify `posts.id` and `users.id`.
+Breakdown the syntax of the knex join. Point out the aliases. Explain why we have clarify `p.id` and `u.id`.
 
 Hit the endpoint with postman or the browswer to see the join statement in action.
 
@@ -209,7 +208,7 @@ Hit the endpoint with postman or the browswer to see the join statement in actio
 
 ## DB Access
 
-We've writing our knex logic directly into the route handlers. This isn't best practice. It's best to separate out all database code in the **database access files** (also called **models**).
+We've been writing our knex logic directly into the route handlers. This isn't best practice. It's best to separate out all database code in the **database access files** (also called **models**).
 
 We've already worked with these types of file in the previous sprint.
 
@@ -242,17 +241,17 @@ const Users = require('./user-model.js');
 
 ...
 
-router.get('/', async (req, res) => {
-  try {
-    // use find()
-    // instead of querying db directly
-    const users = await Users.find();
+router.get('/', (req, res) => {
+  // use find()
+  // instead of querying db directly
+  Users.find()
+  .then(users => {
     res.json(users);
-  } catch (err) {
+  })
+  .catch(err => {
     res.status(500).json({ message: 'Failed to get users' });
-  }
+  });
 });
-
 ```
 
 Our goal is to completely remove database logic from the router file. List the other methods we would need.
@@ -311,30 +310,35 @@ Refactor `GET /api/users/:id` and `GET /api/users/:id/posts` to use the new acce
 One possible solution:
 
 ```js
-router.get('/:id', async (req, res) => {
+router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  try {
-    // update here
-    const user = Users.findById(id);
-    ...
-  } catch (err) {
+  // update here
+  Users.findById(id)
+  .then(user => {
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'Could not find user with given id.' })
+    }
+  })
+  .catch (err => {
     res.status(500).json({ message: 'Failed to get user' });
-  }
+  });
 });
 
-router.get('/:id/posts', async (req, res) => {
+router.get('/:id/posts', (req, res) => {
   const { id } = req.params;
 
-  try {
-    // update here
-    const posts = await Users.findPosts(id);
+  // update here
+  Users.findPosts(id)
+  .then(posts => {
     res.json(posts);
-  } catch (err) {
+  })
+  .catch(err => {
     res.status(500).json({ message: 'failed to get posts' });
-  }
+  });
 });
-
 ```
 
 **wait for students to catch up, use a `yes/no` poll to let students tell you when they are done**
@@ -351,28 +355,28 @@ function add(user) {
 We may wish instead to return the new users.
 
 ```js
-async function add(user) {
-  const [id] = await db('users').insert(user);
-
-  // we can use our findById method
-  return findById(id);
+function add(user) {
+  db('users').insert(user)
+  .then(ids => {
+    // we can use our findById method
+    return findById(ids[0]);
+  });
 }
 ```
 
 In the router file:
 
 ```js
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
   const userData = req.body;
 
-  try {
-    // update here
-    const newUser = Users.add(userData);
-    // and here
+  Users.add(userData)
+  .then(newUser => {
     res.status(201).json(newUser);
-  } catch (err) {
+  })
+  .catch(err => {
     res.status(500).json({ message: 'Failed to create new user' });
-  }
+  });
 });
 ```
 
@@ -383,13 +387,14 @@ Write `update()` and `remove()` and refactor the router to use them.
 One possible solution:
 
 ```js
-async function update(changes, id) {
-  await db('users')
+function update(changes, id) {
+  db('users')
     .where({ id })
-    .update(changes);
-
-  // returns new user
-  return findById(id);
+    .update(changes)
+  .then(count => {
+    // returns new user
+    return findById(id);
+  });
 }
 
 function remove(id) {
@@ -403,14 +408,13 @@ function remove(id) {
 In the router:
 
 ```js
-router.put('/:id', async (req, res) => {
+router.put('/:id', (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-
-  try {
-    // update here
-    const user = await Users.update(changes, id);
-
+  
+  // update here
+  Users.update(changes, id)
+  .then(user => {
     // and here
     if (user) {
       //and here
@@ -418,21 +422,27 @@ router.put('/:id', async (req, res) => {
     } else {
       res.status(404).json({ message: 'Could not find user with given id' });
     }
-  } catch (err) {
+  })
+  .catch (err => {
     res.status(500).json({ message: 'Failed to update user' });
-  }
+  });
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  try {
-    // update here
-    const count = await Users.remove(id);
-    ...
-  } catch (err) {
+  // update here
+  Users.remove(id)
+  .then(count => {
+    if (count) {
+      res.json({ removed: count });
+    } else {
+      res.status(404).json({ message: 'Could not find user with given id' });
+    }
+  })
+  .catch (err => {
     res.status(500).json({ message: 'Failed to delete user' });
-  }
+  });
 });
 ```
 

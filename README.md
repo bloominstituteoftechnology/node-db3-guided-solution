@@ -11,28 +11,15 @@ Starter code is here: [Node DB3 Guided Project](https://github.com/LambdaSchool/
 
 ## Starter Code
 
-The [Starter Code](https://github.com/LambdaSchool/node-db3-guided) for this project is configured to run the server by typing `yarn server` or `npm run server`. The server will restart automatically on changes.
-
-## How to Use this Repository
-
-- clone the [starter code](https://github.com/LambdaSchool/node-db3-guided).
-- create a solution branch: `git checkout -b solution`.
-- add this repository as a remote: `git remote add solution https://github.com/LambdaSchool/node-db3-guided-solution`
-- pull from this repository's `master` branch into the `solution` branch in your local folder `git pull solution master:solution --force`.
-
-A this point you should have a `master` branch pointing to the student's repository and a `solution` branch with the latest changes added to the solution repository.
-
-When making changes to the `solution` branch, commit the changes and type `git push solution solution:master` to push them to this repository.
-
-When making changes to the `master` branch, commit the changes and use `git push origin master` to push them to the student's repository.
+The [Starter Code](https://github.com/LambdaSchool/node-db3-guided) for this project is configured to run the server by typing `npm run server`. The server will restart automatically on changes.
 
 ## Introduce Module Challenge
 
-Introduce the project for the afternoon. If they are done early, encourage them to study tomorrow's content and follow the tutorials on TK.
+Introduce the project for the afternoon. If they are done early, encourage them to study tomorrow's content and follow the tutorials on Canvas.
 
 ## Foreign Keys
 
-Review foreign keys in TK. You may use [SQLTryIt](https://w3schools.com/Sql/tryit.asp?filename=trysql_select_top) as a visual tool as well.
+Review foreign keys in Canvas. You may use [SQLTryIt](https://w3schools.com/Sql/tryit.asp?filename=trysql_select_top) as a visual tool as well.
 
 ## Join Statements
 
@@ -212,7 +199,7 @@ We've been writing our knex logic directly into the route handlers. This isn't b
 
 We've already worked with these types of file in the previous sprint.
 
-Create `./users/user-model.js` file and add the following.
+Create `api/users/user-model.js` file and add the following.
 
 ```js
 // database connection via knex
@@ -233,7 +220,7 @@ function find() {
 }
 ```
 
-And then update the endpoint in `./users/users-router.js`
+And then update the endpoint in `api/users/users-router.js`
 
 ```js
 //add import statement near top
@@ -446,4 +433,4 @@ router.delete('/:id', (req, res) => {
 });
 ```
 
-We can remove `const db = require('../data/dbConfig.js)` from our `users-router` file.
+We can remove `const db = require('../../data/dbConfig.js)` from our `users-router` file.

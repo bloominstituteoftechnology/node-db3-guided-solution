@@ -15,4 +15,5 @@ Guided project for **Node DB3** Module.
 - [ ] type `npm i` to download dependencies.
 - [ ] type `npm run server` to start the API.
 
-Please follow along as the instructor creates database access methods for a multi table schema.
+A client has hired you to track zoo animals.
+For each animal, you must track that their name, species, and all zoos in which they have resided (including zoo name and address). Determine the database tables necessary to track this information.

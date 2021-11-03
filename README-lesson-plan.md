@@ -2,6 +2,9 @@
 
 Guided project solution for **Node DB3** Module.
 
+A client has hired you to track zoo animals.
+For each animal, you must track that their name, species, and all zoos in which they have resided (including zoo name and address). Determine the database tables necessary to track this information.
+
 Starter code is here: [Node DB3 Guided Project](https://github.com/LambdaSchool/node-db3-guided).
 
 ## Prerequisites
@@ -398,7 +401,7 @@ In the router:
 router.put('/:id', (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-  
+
   // update here
   Users.update(changes, id)
   .then(user => {

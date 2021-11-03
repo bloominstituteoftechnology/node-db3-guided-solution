@@ -155,7 +155,7 @@ GROUP BY CategoryId;
 
 ## Multi-Table APIs
 
-Begin working with the guided demo. Show the students the `users` and `posts` tables in `SQLiteStudio`, emphasizing the foreign key in `posts`. Show them that we currently have CRUD endpoints for `users`.
+Begin working with the guided demo. Show the students the `users` and `posts` tables in `SQLiteStudio`, emphasizing the foreign key in `posts`. Show them that we currently have CRUD endpoints for `users`. Adding Eslint to the project highly recommended: `npx eslint --init`.
 
 ### GET /api/users/:id/posts
 

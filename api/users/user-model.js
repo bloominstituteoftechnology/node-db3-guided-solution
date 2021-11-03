@@ -35,7 +35,7 @@ function add(user) {
 }
 
 function update(changes, id) {
-  db('users')
+  return db('users')
     .where({ id })
     .update(changes)
     // eslint-disable-next-line no-unused-vars

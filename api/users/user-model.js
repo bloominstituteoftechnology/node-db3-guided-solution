@@ -24,7 +24,7 @@ async function findPosts(user_id) {
   */
   const rows = await db('posts as p')
     .join('users as u', 'u.id', 'p.user_id')
-    .select('p.id', 'u.username', 'p.contents')
+    .select('p.id as post_id', 'u.username', 'p.contents')
     .where({ user_id })
   return rows
 }
@@ -47,23 +47,12 @@ async function find() {
         etc
     ]
   */
-  const posts = await db('users as u')
+  const rows = await db('users as u')
     .leftJoin('posts as p', 'u.id', 'p.user_id')
-    .select('u.id as user_id', 'u.username', 'p.id as post_id')
-  let users = []
-  for (let post of posts) {
-    let user = users.find(u => u.username === post.username)
-    if (user) {
-      user.post_count++
-    } else {
-      users.push({
-        user_id: post.user_id,
-        username: post.username,
-        post_count: post.post_id ? 1 : 0
-      })
-    }
-  }
-  return users
+    .groupBy('u.id')
+    .select('u.id as user_id', 'u.username')
+    .count('p.id as post_count')
+  return rows
 }
 
 async function findById(id) {

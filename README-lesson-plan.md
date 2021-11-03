@@ -162,275 +162,117 @@ Begin working with the guided demo. Show the students the `users` and `posts` ta
 We may want an endpoint to get all posts for a specific user:
 
 ```js
-router.get('/:id/posts', (req, res) => {
-  const { id } = params;
+router.get('/:id/posts', (req, res, next) => {
+  const { id } = req.params
 
-  db('posts').where({ user_id: id })
-  .then(posts => {
-    res.json(posts);
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'failed to get posts' });
-  });
-});
+  Users.findPosts(id)
+    .then(posts => {
+      res.json(posts)
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 ```
 
-Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join.
+Notice that the response does not include the username of the poster, which may be useful information. We can fix that with a knex join inside Users.findPosts.
 
 ```js
-db('posts as p')
-  .join('users as u', 'u.id', 'p.user_id')
-  .select('p.id', 'u.username', 'p.contents')
-  .where({ user_id: id })
-.then(posts => {
-
-})
+async function findPosts(user_id) {
+  const rows = await db('posts as p')
+    .join('users as u', 'u.id', 'p.user_id')
+    .select('p.id as post_id', 'u.username', 'p.contents')
+    .where({ user_id })
+  return rows
+}
 ```
 
 Breakdown the syntax of the knex join. Point out the aliases. Explain why we have clarify `p.id` and `u.id`.
 
-Hit the endpoint with postman or the browswer to see the join statement in action.
+Hit the endpoint with postman or the browser to see the join statement in action.
 
 **wait for students to catch up, use a `yes/no` poll to let students tell you when they are done**
 
-## DB Access
+### GET /api/users
 
-We've been writing our knex logic directly into the route handlers. This isn't best practice. It's best to separate out all database code in the **database access files** (also called **models**).
-
-We've already worked with these types of file in the previous sprint.
-
-Create `api/users/user-model.js` file and add the following.
+Let's spice up this enpoint by having the User.find function resolve this structure:
 
 ```js
-// database connection via knex
-const db = require('../data/db-config.js');
-
-module.exports = {};
+[
+    {
+        "user_id": 1,
+        "username": "lao_tzu",
+        "post_count": 6
+    },
+    {
+        "user_id": 2,
+        "username": "socrates",
+        "post_count": 3
+    },
+    // etc
+]
 ```
 
-We can now begin to move all database logic into database access methods.
+Walk learners through the solution, including the need to perform a left join so Hypatia won't be cropped out of the result set:
 
 ```js
-module.exports = {
-  find,
-};
-
-function find() {
-  return db('users');
+async function find() {
+  const rows = await db('users as u')
+    .leftJoin('posts as p', 'u.id', 'p.user_id')
+    .groupBy('u.id')
+    .select('u.id as user_id', 'u.username')
+    .count('p.id as post_count')
+  return rows
 }
 ```
 
-And then update the endpoint in `api/users/users-router.js`
+### GET /api/users/:id
+
+Let's improve this endpoint by making Users.findById resolve the following structure:
 
 ```js
-//add import statement near top
-const Users = require('./user-model.js');
-
-...
-
-router.get('/', (req, res) => {
-  // use find()
-  // instead of querying db directly
-  Users.find()
-  .then(users => {
-    res.json(users);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'Failed to get users' });
-  });
-});
-```
-
-Our goal is to completely remove database logic from the router file. List the other methods we would need.
-
-```js
-module.exports = {
-  find,
-  // findById,
-  // findPosts,
-  // add,
-  // update,
-  // remove
-};
-```
-
-Write the other find methods
-
-```js
-module.exports = {
-  find,
-  findById,
-  findPosts,
-  // add,
-  // update,
-  // remove
-};
-
-function find() {
-  return db('users');
-}
-
-function findById(id) {
-  // introduce first()
-  // we can return a single user object
-  // instead of an array
-  return db('users')
-    .where({ id })
-    .first();
-}
-
-function findPosts(user_id) {
-  // copy code from GET /api/users/:id/posts
-  return db('posts as p')
-      .join('users as u', 'u.id', 'p.user_id')
-      .select('p.id', 'u.username', 'p.contents')
-      // update to match param name
-      .where({ user_id });
-  );
+{
+  "user_id": 2,
+  "username": "socrates"
+  "posts": [
+    {
+      "post_id": 7,
+      "contents": "Beware of the barrenness of a busy life."
+    },
+    // etc
+  ]
 }
 ```
 
-### YOU DO (5 minutes)
-
-Refactor `GET /api/users/:id` and `GET /api/users/:id/posts` to use the new access methods.
-
-One possible solution:
+Walk learners through the solution, including the need to perform a left join so Hypatia won't be cropped out of the result set:
 
 ```js
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
+async function findById(id) {
+  const rows = await db('users as u')
+    .leftJoin('posts as p', 'u.id', 'p.user_id')
+    .select(
+      'u.id as user_id',
+      'u.username',
+      'p.id as post_id',
+      'p.contents',
+    )
+    .where('u.id', id)
 
-  // update here
-  Users.findById(id)
-  .then(user => {
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id.' })
+  // THE ROWS FROM THE DB SOMETIMES NEED FURTHER WORK!
+  // We must use vanilla JS to hammer the data into the correct shape:
+  let result = { posts: [] }
+  for (let record of rows) {
+    if (!result.username) {
+      result.user_id = record.user_id
+      result.username = record.username
     }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to get user' });
-  });
-});
-
-router.get('/:id/posts', (req, res) => {
-  const { id } = req.params;
-
-  // update here
-  Users.findPosts(id)
-  .then(posts => {
-    res.json(posts);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'failed to get posts' });
-  });
-});
-```
-
-**wait for students to catch up, use a `yes/no` poll to let students tell you when they are done**
-
-Write the add function next.
-
-```js
-function add(user) {
-  // returns an array with new user id
-  return db('users').insert(user);
-}
-```
-
-We may wish instead to return the new users.
-
-```js
-function add(user) {
-  db('users').insert(user)
-  .then(ids => {
-    // we can use our findById method
-    return findById(ids[0]);
-  });
-}
-```
-
-In the router file:
-
-```js
-router.post('/', (req, res) => {
-  const userData = req.body;
-
-  Users.add(userData)
-  .then(newUser => {
-    res.status(201).json(newUser);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'Failed to create new user' });
-  });
-});
-```
-
-#### You Do (5 minutes) - Optional (10 minutes remaining)
-
-Write `update()` and `remove()` and refactor the router to use them.
-
-One possible solution:
-
-```js
-function update(changes, id) {
-  db('users')
-    .where({ id })
-    .update(changes)
-  .then(count => {
-    // returns new user
-    return findById(id);
-  });
-}
-
-function remove(id) {
-  // returns removed count
-  return db('users')
-    .where({ id })
-    .del();
-}
-```
-
-In the router:
-
-```js
-router.put('/:id', (req, res) => {
-  const { id } = req.params;
-  const changes = req.body;
-
-  // update here
-  Users.update(changes, id)
-  .then(user => {
-    // and here
-    if (user) {
-      //and here
-      res.json({ user });
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id' });
+    if (record.post_id) {
+      result.posts.push({
+        contents: record.contents,
+        post_id: record.post_id,
+      })
     }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to update user' });
-  });
-});
-
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-
-  // update here
-  Users.remove(id)
-  .then(count => {
-    if (count) {
-      res.json({ removed: count });
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id' });
-    }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to delete user' });
-  });
-});
+  }
+  return result
+}
 ```
-
-We can remove `const db = require('../../data/dbConfig.js)` from our `users-router` file.

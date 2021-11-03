@@ -1,96 +1,90 @@
-const express = require('express');
+const express = require('express')
 
-const Users = require('./user-model.js');
+const Users = require('./user-model.js')
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/', (req, res) => {
-  // use find()
-  // instead of querying db directly
+router.get('/', (req, res, next) => {
   Users.find()
-  .then(users => {
-    res.json(users);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'Failed to get users' });
-  });
-});
+    .then(users => {
+      res.json(users)
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
+router.get('/:id', (req, res, next) => {
+  const { id } = req.params
 
   Users.findById(id)
-  .then(user => {
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id.' })
-    }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to get user' });
-  });
-});
+    .then(user => {
+      if (user) {
+        res.json(user)
+      } else {
+        next({ message: 'Could not find user with given id.', status: 404 })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-router.get('/:id/posts', (req, res) => {
-  const { id } = req.params;
+router.get('/:id/posts', (req, res, next) => {
+  const { id } = req.params
 
   Users.findPosts(id)
-  .then(posts => {
-    res.json(posts);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'failed to get posts' });
-  });
-});
+    .then(posts => {
+      res.json(posts)
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-router.post('/', (req, res) => {
-  const userData = req.body;
+router.post('/', (req, res, next) => {
+  const userData = req.body
 
   Users.add(userData)
-  .then(newUser => {
-    res.status(201).json(newUser);
-  })
-  .catch(err => {
-    res.status(500).json({ message: 'Failed to create new user' });
-  });
-});
+    .then(newUser => {
+      res.status(201).json(newUser)
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-router.put('/:id', (req, res) => {
-  const { id } = req.params;
-  const changes = req.body;
-  
-  // update here
+router.put('/:id', (req, res, next) => {
+  const { id } = req.params
+  const changes = req.body
+
   Users.update(changes, id)
-  .then(user => {
-    // and here
-    if (user) {
-      //and here
-      res.json({ user });
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id' });
-    }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to update user' });
-  });
-});
+    .then(user => {
+      if (user) {
+        res.json({ user })
+      } else {
+        next({ message: 'Could not find user with given id.', status: 404 })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params
 
-  // update here
   Users.remove(id)
-  .then(count => {
-    if (count) {
-      res.json({ removed: count });
-    } else {
-      res.status(404).json({ message: 'Could not find user with given id' });
-    }
-  })
-  .catch (err => {
-    res.status(500).json({ message: 'Failed to delete user' });
-  });
-});
+    .then(count => {
+      if (count) {
+        res.json({ removed: count })
+      } else {
+        next({ message: 'Could not find user with given id.', status: 404 })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
-module.exports = router;
+module.exports = router

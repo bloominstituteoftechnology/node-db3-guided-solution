@@ -1,16 +1,16 @@
-const db = require('../../data/db-config.js');
+const db = require('../../data/db-config.js')
 
 module.exports = {
   find,
-  findById, 
-  findPosts, 
-  add, 
-  update, 
+  findById,
+  findPosts,
+  add,
+  update,
   remove
 }
 
 function find() {
-  return db('users');
+  return db('users')
 }
 
 function findById(id) {
@@ -26,26 +26,25 @@ function findPosts(user_id) {
   return db('posts as p')
     .join('users as u', 'u.id', 'p.user_id')
     .select('p.id', 'u.username', 'p.contents')
-    // update to match param name
-    .where({ user_id });
+    .where({ user_id })
 }
 
 function add(user) {
   // returns an array with new user id
-  return db('users').insert(user);
+  return db('users').insert(user)
 }
 
 function update(changes, id) {
   db('users')
     .where({ id })
     .update(changes)
-  .then(count => {
-    // returns new user
-    return findById(id);
-  });
+    // eslint-disable-next-line no-unused-vars
+    .then(count => {
+      return findById(id)
+    })
 }
 
 function remove(id) {
   // returns removed count
-  return db('users').where({ id }).del();
+  return db('users').where({ id }).del()
 }

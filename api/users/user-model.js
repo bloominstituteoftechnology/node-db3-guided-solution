@@ -10,6 +10,18 @@ module.exports = {
 }
 
 async function findPosts(user_id) {
+  /*
+    Implement so it resolves this structure:
+
+    [
+      {
+          "post_id": 10,
+          "contents": "Trusting everyone is...",
+          "username": "seneca"
+      },
+      etc
+    ]
+  */
   const rows = await db('posts as p')
     .join('users as u', 'u.id', 'p.user_id')
     .select('p.id', 'u.username', 'p.contents')
@@ -18,6 +30,23 @@ async function findPosts(user_id) {
 }
 
 async function find() {
+  /*
+    Improve so it resolves this structure:
+
+    [
+        {
+            "user_id": 1,
+            "username": "lao_tzu",
+            "post_count": 6
+        },
+        {
+            "user_id": 2,
+            "username": "socrates",
+            "post_count": 3
+        },
+        etc
+    ]
+  */
   const posts = await db('users as u')
     .leftJoin('posts as p', 'u.id', 'p.user_id')
     .select('u.id as user_id', 'u.username', 'p.id as post_id')
@@ -38,6 +67,21 @@ async function find() {
 }
 
 async function findById(id) {
+  /*
+    Improve so it resolves this structure:
+
+    {
+      "user_id": 2,
+      "username": "socrates"
+      "posts": [
+        {
+          "post_id": 7,
+          "contents": "Beware of the barrenness of a busy life."
+        },
+        etc
+      ]
+    }
+  */
   const rows = await db('users as u')
     .leftJoin('posts as p', 'u.id', 'p.user_id')
     .select(

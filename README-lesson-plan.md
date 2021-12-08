@@ -25,6 +25,8 @@ Review foreign keys in Canvas. You may use [SQLTryIt](https://w3schools.com/Sql/
 
 Open [SQLTryIt](https://w3schools.com/Sql/tryit.asp?filename=trysql_select_top).
 
+Alternatively, you can demo using the Northwind database included inside the data folder, and SQLite Studio.
+
 Pull up the products table. We can see that there are two foreign keys in this table, which doesn't allow us to easily see who the supplier is for each product. Run:
 
 ```sql

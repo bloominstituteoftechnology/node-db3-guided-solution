@@ -162,16 +162,12 @@ Begin working with the guided demo. Show the students the `users` and `posts` ta
 We may want an endpoint to get all posts for a specific user:
 
 ```js
-router.get('/:id/posts', (req, res, next) => {
-  const { id } = req.params
-
-  Users.findPosts(id)
+router.get('/:id/posts', checkUserId, (req, res, next) => {
+  User.findPosts(req.params.id)
     .then(posts => {
       res.json(posts)
     })
-    .catch(err => {
-      next(err)
-    })
+    .catch(next)
 })
 ```
 

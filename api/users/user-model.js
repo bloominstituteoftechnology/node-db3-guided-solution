@@ -5,7 +5,6 @@ module.exports = {
   find,
   findById,
   add,
-  update,
   remove
 }
 
@@ -100,15 +99,6 @@ function add(user) {
   return db('users')
     .insert(user)
     .then(([id]) => { // eslint-disable-line
-      return findById(id)
-    })
-}
-
-function update(changes, id) {
-  return db('users')
-    .where({ id })
-    .update(changes)
-    .then(count => { // eslint-disable-line
       return findById(id)
     })
 }

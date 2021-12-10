@@ -2,7 +2,7 @@
 
 Guided project solution for **Node DB3** Module.
 
-Starter code is here: [Node DB3 Guided Project](https://github.com/LambdaSchool/node-db3-guided).
+Starter code is here: [Node DB3 Guided Project](https://github.com/bloominstituteoftechnology/node-db3-guided).
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ Starter code is here: [Node DB3 Guided Project](https://github.com/LambdaSchool/
 
 ## Starter Code
 
-The [Starter Code](https://github.com/LambdaSchool/node-db3-guided) for this project is configured to run the server by typing `npm run server`. The server will restart automatically on changes.
+The [Starter Code](https://github.com/bloominstituteoftechnology/node-db3-guided) for this project is configured to run the server by typing `npm run server`. The server will restart automatically on changes.
 
 ## Introduce Module Challenge
 
